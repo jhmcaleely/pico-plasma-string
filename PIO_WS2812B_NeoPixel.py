@@ -5,8 +5,13 @@ from rp2 import PIO, StateMachine, asm_pio
 # Configure the number of WS2812 LEDs.
 NUM_LEDS = 50
 
-@asm_pio(sideset_init=PIO.OUT_LOW, out_shiftdir=PIO.SHIFT_LEFT,
-         autopull=True, pull_thresh=24)
+# pio deals in 32 bit machine words
+ar = array.array("I", [0 for _ in range(NUM_LEDS)])
+
+@asm_pio(sideset_init=PIO.OUT_LOW,
+         out_shiftdir=PIO.SHIFT_LEFT,
+         autopull=True,
+         pull_thresh=24)
 def ws2812():
     T1 = 2
     T2 = 5
@@ -18,40 +23,15 @@ def ws2812():
     label("do_zero")
     nop()					.side(0) [T2 - 1]
 
+def set_LED(n, r, g, b):
+    ar[n] = (r << 16) + (g << 8) + b
+
+def refresh_LEDs():
+    sm.put(ar, 8) # shift 8 bits, as we will ignore 8 of every 32.
+
 # Create a StateMachine with the ws2812 code and output on Pin(15).
 # Pin 15 matches Pimoroni Plasma Stick 2040W
 sm = StateMachine(0, ws2812, freq=8000000, sideset_base=Pin(15))
 
 # Start the StateMachine, it will wait for data on its FIFO.
 sm.active(1)
-
-# Display a pattern on the LEDs via an array of LED RGB values.
-ar = array.array("I", [0 for _ in range(NUM_LEDS)])
-
-print("blue")
-for j in range(0, 255):
-    for i in range(NUM_LEDS):
-        ar[i] = j
-    sm.put(ar, 8)
-    time.sleep_ms(10)
-
-print("red")
-for j in range(0, 255):
-    for i in range(NUM_LEDS):
-        ar[i] = j<<16
-    sm.put(ar, 8)
-    time.sleep_ms(10)
-
-print("green")
-for j in range(0, 255):
-    for i in range(NUM_LEDS):
-        ar[i] = j<<8
-    sm.put(ar, 8)
-    time.sleep_ms(10)
-
-print("white")
-for j in range(0, 255):
-    for i in range(NUM_LEDS):
-        ar[i] = (j<<16) + (j<<8) + j
-    sm.put(ar, 8)
-    time.sleep_ms(10)
