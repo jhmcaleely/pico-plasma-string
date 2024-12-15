@@ -21,23 +21,37 @@ def display_pixels():
         set_LED(i, r, g, b)
     refresh_LEDs()
 
+
 while True:
     for i in range(50):
+        pixel(i, 0, 0, 0)
+    
+    for i in range(50):
+        
         if i == chase:
-            pixel(i, 0, 0, 255)
+            pixel(i,          0, 0, 255)
+            pixel((i+1) % 50, 0, 0, 32)
+            pixel((i-1) % 50, 0, 0, 32)
+            pixel((i-2) % 50, 0, 0, 4)
+            
         elif i == chase2:
-            pixel(i, 255, 0, 0)
+            pixel(i,          255, 0, 0)
+            pixel((i+1) % 50, 32,  0, 0)
+            pixel((i-1) % 50, 32,  0, 0)
+            pixel((i-2) % 50, 4,  0, 0)
+            
         elif i == chase3:
-            pixel(i, 0, 255, 0)
-        else:
-            pixel(i, 0, 0, 0)
+            pixel(i,          0, 255, 0)
+            pixel((i-1) % 50, 0, 32,  0)
+            pixel((i+1) % 50, 0, 32,  0)
+            pixel((i+2) % 50, 0, 4,  0)
         
         if chase == chase3 == i:
             pixel(i, 255, 255, 0)
-            n = (i + 1) % 50
-            pixel(n, 255, 255, 0)
-            m = (i - 1) % 50
-            pixel(m, 255, 255, 0)
+            pixel((i + 2) % 50, 4, 4, 0)
+            pixel((i + 1) % 50, 255, 255, 0)
+            pixel((i - 1) % 50, 255, 255, 0)
+            pixel((i - 2) % 50, 4, 4, 0)
             display_pixels()
             sleep(0.5)
             
@@ -45,5 +59,5 @@ while True:
     
     chase = (chase + 1) % 50
     chase2 = (chase2 + randint(-1, 1)) % 50
-    chase3 = (chase3 - randint(1, 3)) % 50
+    chase3 = (chase3 - 1) % 50
     sleep(0.1)
