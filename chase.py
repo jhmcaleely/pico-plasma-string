@@ -43,7 +43,7 @@ while True:
             
     display_pixels()
     
-    chase2 = (chase2 + randint(-1, 1)) % 50
     chase = (chase + 1) % 50
-    chase3 = (chase3 - 1) % 50
+    chase2 = (chase2 + randint(-1, 1)) % 50
+    chase3 = (chase3 - randint(1, 3)) % 50
     sleep(0.1)
